@@ -22,7 +22,7 @@ namespace CookSolver.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CookSolver.Data.Entities.Meal", b =>
+            modelBuilder.Entity("CookSolver.Backend.Data.Entities.Meal", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -40,7 +40,7 @@ namespace CookSolver.Migrations
                     b.ToTable("Meal");
                 });
 
-            modelBuilder.Entity("CookSolver.Data.Entities.MealHistoryItem", b =>
+            modelBuilder.Entity("CookSolver.Backend.Data.Entities.MealHistoryItem", b =>
                 {
                     b.Property<Guid>("MealId")
                         .HasColumnType("uuid");
@@ -53,9 +53,9 @@ namespace CookSolver.Migrations
                     b.ToTable("MealHistoryItem");
                 });
 
-            modelBuilder.Entity("CookSolver.Data.Entities.MealHistoryItem", b =>
+            modelBuilder.Entity("CookSolver.Backend.Data.Entities.MealHistoryItem", b =>
                 {
-                    b.HasOne("CookSolver.Data.Entities.Meal", "Meal")
+                    b.HasOne("CookSolver.Backend.Data.Entities.Meal", "Meal")
                         .WithMany("MealHistoryItems")
                         .HasForeignKey("MealId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -64,7 +64,7 @@ namespace CookSolver.Migrations
                     b.Navigation("Meal");
                 });
 
-            modelBuilder.Entity("CookSolver.Data.Entities.Meal", b =>
+            modelBuilder.Entity("CookSolver.Backend.Data.Entities.Meal", b =>
                 {
                     b.Navigation("MealHistoryItems");
                 });

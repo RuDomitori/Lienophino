@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CookSolver", "CookSolver\CookSolver.csproj", "{796A2955-C3B7-4AB2-A970-D9F61268F57E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CookSolver.Backend", "CookSolver.Backend\CookSolver.Backend.csproj", "{796A2955-C3B7-4AB2-A970-D9F61268F57E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
