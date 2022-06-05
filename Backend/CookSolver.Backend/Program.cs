@@ -25,6 +25,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Configuring CORS to be able to run frontend by command "npm start"
+app.UseCors(corsPolicyBuilder =>
+{
+    corsPolicyBuilder
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials()
+        .WithOrigins("http://localhost:3000");
+});
+
 app.UseAuthorization();
 
 app.MapControllers();
