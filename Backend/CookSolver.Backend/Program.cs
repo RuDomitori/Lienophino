@@ -1,5 +1,6 @@
 using CookSolver.Data;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,12 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Host.UseSerilog((context, provider, configuration) =>
+{
+    configuration
+        .ReadFrom.Services(provider)
+        .ReadFrom.Configuration(context.Configuration);
+});
 
 builder.Services.AddDbContext<AppDbContext>(optionsBuilder =>
 {
@@ -16,7 +23,16 @@ builder.Services.AddDbContext<AppDbContext>(optionsBuilder =>
     optionsBuilder.UseNpgsql(connectionString);
 });
 
+
 var app = builder.Build();
+
+app.UseSerilogRequestLogging(options =>
+{
+    options.EnrichDiagnosticContext = (context, httpContext) =>
+    {
+        context.Set("RemoteIp", httpContext.Connection.RemoteIpAddress);
+    };
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
