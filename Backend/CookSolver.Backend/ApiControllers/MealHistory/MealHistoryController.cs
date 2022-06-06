@@ -1,4 +1,7 @@
-﻿using CookSolver.Data;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using CookSolver.ApiModel;
+using CookSolver.Data;
 using CookSolver.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,50 +15,35 @@ public class MealHistoryController : ControllerBase
     #region Constructor and dependensies
     
     private readonly AppDbContext _dbContext;
+    private readonly IMapper _mapper;
 
-    public MealHistoryController(AppDbContext dbContext)
+    public MealHistoryController(AppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
+        _mapper = mapper;
     }
 
     #endregion
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<MealHistoryItem>>> Get(DateTime? date)
+    public ActionResult<IQueryable<ApiMealHistoryItem>> Get(DateTime? date)
     {
         var dateOnly = date is null
             ? null as DateOnly?
             : DateOnly.FromDateTime(date.Value);
         
-        var mealHistoryItems = await _dbContext.Set<MealHistoryItem>()
+        var mealHistoryItems = _dbContext.Set<MealHistoryItem>()
             .Where(x => date == null || x.Date == dateOnly)
-            .ToListAsync();
+            .ProjectTo<ApiMealHistoryItem>(_mapper.ConfigurationProvider);
 
-        return Ok(mealHistoryItems.Select(x => new MealHistoryItemDto
-        {
-            Date = x.Date.ToDateTime(TimeOnly.MinValue),
-            MealId = x.MealId
-        }));
+        return Ok(mealHistoryItems);
     }
 
     [HttpPost("Changes")]
-    public async Task<ActionResult<IEnumerable<MealHistoryItem>>> Post(MealHistoryChangesDto changes)
+    public async Task<ActionResult<IEnumerable<ApiMealHistoryItem>>> Post(MealHistoryChangesDto changes)
     {
-        var itemsToAdd = changes.ToAdd
-            .Select(x => new MealHistoryItem
-            {
-                Date = DateOnly.FromDateTime(x.Date),
-                MealId = x.MealId
-            })
-            .ToList();
-        
-        var itemsToDelete = changes.ToDelete
-            .Select(x => new MealHistoryItem
-            {
-                Date = DateOnly.FromDateTime(x.Date),
-                MealId = x.MealId
-            })
-            .ToList();
+        var itemsToAdd = _mapper.Map<List<MealHistoryItem>>(changes.ToAdd);
+        var itemsToDelete = _mapper.Map<List<MealHistoryItem>>(changes.ToDelete);
 
         var dates = itemsToAdd
             .Select(x => x.Date)
@@ -92,10 +80,6 @@ public class MealHistoryController : ControllerBase
         _dbContext.RemoveRange(itemsToDelete);
         await _dbContext.SaveChangesAsync();
 
-        return Ok(itemsToAdd.Select(x => new MealHistoryItemDto
-        {
-            Date = x.Date.ToDateTime(TimeOnly.MinValue),
-            MealId = x.MealId
-        }));
+        return Ok(_mapper.Map<IEnumerable<ApiMealHistoryItem>>(itemsToAdd));
     }
 }

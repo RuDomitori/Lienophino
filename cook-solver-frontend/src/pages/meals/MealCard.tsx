@@ -1,10 +1,10 @@
-import MealDto from "../../backendApi/models/MealDto";
+import ApiMeal from "../../backendApi/models/ApiMeal";
 import {FC, useCallback} from "react";
 
 interface MealCardProps {
-    meal: MealDto,
-    onEdit: (meal: MealDto) => void,
-    onDelete: (meal: MealDto) => void
+    meal: ApiMeal,
+    onEdit: (meal: ApiMeal) => void,
+    onDelete: (meal: ApiMeal) => void
 }
 
 const MealCard: FC<MealCardProps> = function({meal, onEdit, onDelete}) {

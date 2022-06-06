@@ -1,4 +1,4 @@
-import MealDto from "../../backendApi/models/MealDto";
+import ApiMeal from "../../backendApi/models/ApiMeal";
 import {FC, useCallback, useState} from "react";
 import {Formik} from "formik";
 import {object, string} from "yup";
@@ -10,7 +10,7 @@ import classNames from "classnames";
 interface NewMealCreatingModalProps {
     show: boolean,
     onHide: () => void,
-    onSave: (meal: MealDto) => void
+    onSave: (meal: ApiMeal) => void
 }
 
 const MealCreatingModal: FC<NewMealCreatingModalProps> = function ({show, onHide, onSave}) {
@@ -84,10 +84,10 @@ const MealCreatingModal: FC<NewMealCreatingModalProps> = function ({show, onHide
     );
 };
 
-export function useMealCreatingModal(onSave?: (meal: MealDto) => void) {
+export function useMealCreatingModal(onSave?: (meal: ApiMeal) => void) {
     const [showModal, setShowModal] = useState(false);
     const handleHiding = useCallback(() => setShowModal(false),[]);
-    const handleSaving = useCallback((meal: MealDto) => {
+    const handleSaving = useCallback((meal: ApiMeal) => {
         setShowModal(false);
         onSave?.(meal);
     }, [onSave]);

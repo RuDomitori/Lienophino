@@ -1,11 +1,11 @@
 import {useEffect, useState} from "react";
-import MealDto from "../backendApi/models/MealDto";
+import ApiMeal from "../backendApi/models/ApiMeal";
 import MealApiService from "../backendApi/services/MealApiService";
 import {ProblemDetails} from "../backendApi/models/ProblemDetails";
 
 export default function useMeals() {
     const [state, setState] = useState({
-        meals: [] as MealDto[],
+        meals: [] as ApiMeal[],
         loading: false,
         error: null as (string | null)
     });

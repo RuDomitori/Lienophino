@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace CookSolver.ApiControllers.MealHistory;
+namespace CookSolver.ApiModel;
 
-public class MealHistoryItemDto
+public class ApiMealHistoryItem
 {
     [BindRequired]
     public DateTime Date { get; set; }

@@ -1,3 +1,4 @@
+using CookSolver.ApiModel;
 using CookSolver.Data;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -22,6 +23,8 @@ builder.Services.AddDbContext<AppDbContext>(optionsBuilder =>
     var connectionString = builder.Configuration.GetConnectionString("Default");
     optionsBuilder.UseNpgsql(connectionString);
 });
+
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 
 var app = builder.Build();

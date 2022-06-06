@@ -1,6 +1,6 @@
 import configuration from "../../configuration";
 import {extractProblemDetails} from "../../utils";
-import MealDto from "../models/MealDto";
+import ApiMeal from "../models/ApiMeal";
 
 interface GetArgs {
 
@@ -29,7 +29,7 @@ export default abstract class MealApiService {
 
         return await extractProblemDetails(responsePromise, async response => {
             const json = await response.json() as Object[];
-            return json.map(x => MealDto.fromJson(x));
+            return json.map(x => ApiMeal.fromJson(x));
         });
     }
 
@@ -46,7 +46,7 @@ export default abstract class MealApiService {
 
         return await extractProblemDetails(responsePromise, async response => {
             const json = await response.json();
-            return MealDto.fromJson(json);
+            return ApiMeal.fromJson(json);
         });
     }
 

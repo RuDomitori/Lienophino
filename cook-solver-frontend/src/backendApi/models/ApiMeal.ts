@@ -1,23 +1,23 @@
 import {pickByKeys} from "../../utils";
 import _ from "lodash";
 
-export interface IMealDto {
+export interface IApiMeal {
     id: string;
     name: string;
     description: string | null;
 }
 
-export default class MealDto implements IMealDto{
+export default class ApiMeal implements IApiMeal {
     id!: string;
     name!: string;
     description!: string | null;
 
-    constructor(dto: IMealDto) {
-        this.with(dto);
+    constructor(iMeal: IApiMeal) {
+        this.with(iMeal);
     }
 
-    public with(iMessage: Partial<IMealDto>): MealDto {
-        const item = pickByKeys(iMessage, [
+    public with(iMeal: Partial<IApiMeal>): ApiMeal {
+        const item = pickByKeys(iMeal, [
             "id",
             "name",
             "description"
@@ -26,11 +26,11 @@ export default class MealDto implements IMealDto{
         return _.assign(this, item);
     }
 
-    public static fromJson(json: string | object): MealDto {
+    public static fromJson(json: string | object): ApiMeal {
         const item = typeof json === "string"
             ? JSON.parse(json)
             : json;
 
-        return new MealDto(item as IMealDto);
+        return new ApiMeal(item as IApiMeal);
     }
 }

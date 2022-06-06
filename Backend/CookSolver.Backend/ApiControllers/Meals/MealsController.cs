@@ -1,3 +1,6 @@
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using CookSolver.ApiModel;
 using CookSolver.Data;
 using CookSolver.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -11,21 +14,21 @@ public class MealsController : ControllerBase
 {
     #region Constructor and dependensies
     
-    private readonly ILogger<MealsController> _logger;
     private readonly AppDbContext _dbContext;
+    private readonly IMapper _mapper;
 
-    public MealsController(ILogger<MealsController> logger, AppDbContext dbContext)
+    public MealsController(AppDbContext dbContext, IMapper mapper)
     {
-        _logger = logger;
         _dbContext = dbContext;
+        _mapper = mapper;
     }
 
     #endregion
     
     [HttpGet]
-    public ActionResult<IEnumerable<Meal>> Get()
+    public ActionResult<IEnumerable<ApiMeal>> Get()
     {
-        return Ok(_dbContext.Set<Meal>());
+        return Ok(_dbContext.Set<Meal>().ProjectTo<ApiMeal>(_mapper.ConfigurationProvider));
     }
 
     [HttpPost]

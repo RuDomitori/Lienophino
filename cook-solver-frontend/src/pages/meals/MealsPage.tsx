@@ -2,14 +2,14 @@ import {FC, useCallback} from "react";
 import useMeals from "../../hooks/useMeals";
 import {useMealCreatingModal} from "./MealCreatingModal";
 import MealCard from "./MealCard";
-import MealDto from "../../backendApi/models/MealDto";
+import ApiMeal from "../../backendApi/models/ApiMeal";
 import MealApiService from "../../backendApi/services/MealApiService";
 import {ProblemDetails} from "../../backendApi/models/ProblemDetails";
 
 const MealsPage: FC = function () {
     const meals = useMeals();
-    const handleMealEditing = useCallback((meal:MealDto) => console.log("Edit.", meal), []);
-    const handleMealDeleting = useCallback((meal:MealDto) => {
+    const handleMealEditing = useCallback((meal:ApiMeal) => console.log("Edit.", meal), []);
+    const handleMealDeleting = useCallback((meal:ApiMeal) => {
         MealApiService.delete({id: meal.id})
             .then(response => {
                 if(response instanceof ProblemDetails)
