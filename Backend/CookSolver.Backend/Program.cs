@@ -1,5 +1,6 @@
 using CookSolver.ApiModel;
 using CookSolver.Data;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -25,6 +26,7 @@ builder.Services.AddDbContext<AppDbContext>(optionsBuilder =>
 });
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+builder.Services.AddMediatR(typeof(Program));
 
 
 var app = builder.Build();

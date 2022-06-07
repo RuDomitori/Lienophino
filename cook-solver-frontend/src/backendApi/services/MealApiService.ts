@@ -60,7 +60,8 @@ export default abstract class MealApiService {
         });
 
         return await extractProblemDetails(responsePromise, async response => {
-            return await response.text();
+            const json = await response.json();
+            return ApiMeal.fromJson(json);
         });
     }
 }

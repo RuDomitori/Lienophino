@@ -1,10 +1,10 @@
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using CookSolver.ApiModel;
-using CookSolver.Data;
-using CookSolver.Data.Entities;
+using CookSolver.Commands;
+using CookSolver.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace CookSolver.ApiControllers.Meals;
 
@@ -14,47 +14,61 @@ public class MealsController : ControllerBase
 {
     #region Constructor and dependensies
     
-    private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly IMediator _mediator;
 
-    public MealsController(AppDbContext dbContext, IMapper mapper)
+    public MealsController(IMapper mapper, IMediator mediator)
     {
-        _dbContext = dbContext;
         _mapper = mapper;
+        _mediator = mediator;
     }
 
     #endregion
     
     [HttpGet]
-    public ActionResult<IEnumerable<ApiMeal>> Get()
+    public async Task<ActionResult<IEnumerable<ApiMeal>>> Get()
     {
-        return Ok(_dbContext.Set<Meal>().ProjectTo<ApiMeal>(_mapper.ConfigurationProvider));
+        var meals = await _mediator.Send(new GetMeals());
+
+        return Ok(_mapper.Map<IEnumerable<ApiMeal>>(meals));
     }
 
-    [HttpPost]
-    public async Task<ActionResult<Meal>> Post(Meal meal)
+    public class PostDto
     {
-        meal.Id = Guid.NewGuid();
-        _dbContext.Add(meal);
-        await _dbContext.SaveChangesAsync();
-        return Ok(meal);
+        [BindRequired] public string Name { get; set; }
+        public string Description { get; set; }
     }
     
-    [HttpPut]
-    public async Task<ActionResult<Meal>> Put(Meal meal)
+    [HttpPost]
+    public async Task<ActionResult<ApiMeal>> Post(PostDto dto)
     {
-        _dbContext.Update(meal);
-        await _dbContext.SaveChangesAsync();
-        return Ok(meal);
+        var meal = await _mediator.Send(new CreateMeal
+        {
+            Name = dto.Name,
+            Description = dto.Description
+        });
+        
+        return Ok(_mapper.Map<ApiMeal>(meal));
+    }
+    
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<ApiMeal>> Put(ApiMeal dto)
+    {
+        var meal = await _mediator.Send(new ChangeMeal
+        {
+            Id = dto.Id,
+            Name = dto.Name,
+            Description = dto.Description
+        });
+
+        return Ok(_mapper.Map<ApiMeal>(meal));
     }
     
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<Guid>> Delete(Guid id)
     {
-        var meal = await _dbContext.Set<Meal>()
-            .SingleAsync(x => x.Id == id);
-        _dbContext.Remove(meal);
-        await _dbContext.SaveChangesAsync();
-        return Ok(id);
+        var meal = await _mediator.Send(new DeleteMeal{Id = id});
+        
+        return Ok(_mapper.Map<ApiMeal>(meal));
     }
 }

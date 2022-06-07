@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using CookSolver.ApiModel;
-using CookSolver.Data;
+using CookSolver.Commands;
 using CookSolver.Data.Entities;
+using CookSolver.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CookSolver.ApiControllers.MealHistory;
 
@@ -13,73 +13,40 @@ namespace CookSolver.ApiControllers.MealHistory;
 public class MealHistoryController : ControllerBase
 {
     #region Constructor and dependensies
-    
-    private readonly AppDbContext _dbContext;
-    private readonly IMapper _mapper;
 
-    public MealHistoryController(AppDbContext dbContext, IMapper mapper)
+    private readonly IMapper _mapper;
+    private readonly IMediator _mediator;
+
+    public MealHistoryController(IMapper mapper, IMediator mediator)
     {
-        _dbContext = dbContext;
         _mapper = mapper;
+        _mediator = mediator;
     }
 
     #endregion
 
     [HttpGet]
-    public ActionResult<IQueryable<ApiMealHistoryItem>> Get(DateTime? date)
+    public async Task<ActionResult<IQueryable<ApiMealHistoryItem>>> Get(DateTime? date)
     {
-        var dateOnly = date is null
-            ? null as DateOnly?
-            : DateOnly.FromDateTime(date.Value);
-        
-        var mealHistoryItems = _dbContext.Set<MealHistoryItem>()
-            .Where(x => date == null || x.Date == dateOnly)
-            .ProjectTo<ApiMealHistoryItem>(_mapper.ConfigurationProvider);
+        var items = await _mediator.Send(new GetMealHistory
+        {
+            Date = date is null
+                ? null
+                : DateOnly.FromDateTime(date.Value)
+        });
 
-        return Ok(mealHistoryItems);
+        return Ok(_mapper.Map<List<ApiMealHistoryItem>>(items));
     }
 
     [HttpPost("Changes")]
     public async Task<ActionResult<IEnumerable<ApiMealHistoryItem>>> Post(MealHistoryChangesDto changes)
     {
-        var itemsToAdd = _mapper.Map<List<MealHistoryItem>>(changes.ToAdd);
-        var itemsToDelete = _mapper.Map<List<MealHistoryItem>>(changes.ToDelete);
+        var addedItems = await _mediator.Send(new ChangeMealHistory
+        {
+            ToAdd = _mapper.Map<List<MealHistoryItem>>(changes.ToAdd),
+            ToDelete = _mapper.Map<List<MealHistoryItem>>(changes.ToDelete)
+        });
 
-        var dates = itemsToAdd
-            .Select(x => x.Date)
-            .Union(itemsToDelete.Select(x => x.Date));
-
-        var mealIds = itemsToAdd
-            .Select(x => x.MealId)
-            .Union(itemsToDelete.Select(x => x.MealId));
-
-        var itemsFromDb = await _dbContext.Set<MealHistoryItem>()
-            .Where(x => dates.Contains(x.Date) 
-                        && mealIds.Contains(x.MealId))
-            .ToListAsync();
-
-        itemsToAdd = itemsToAdd
-            .GroupJoin(itemsFromDb,
-                l => (l.Date, l.MealId),
-                r => (r.Date, r.MealId),
-                (l, r) => (ItemToAdd: l, AlreadyExist: r.Any()))
-            .Where(x => !x.AlreadyExist)
-            .Select(x => x.ItemToAdd)
-            .ToList();
-
-        itemsToDelete = itemsToDelete
-            .GroupJoin(itemsFromDb,
-                l => (l.Date, l.MealId),
-                r => (r.Date, r.MealId),
-                (l, r) => (ItemToAdd: l, Exist: r.Any()))
-            .Where(x => x.Exist)
-            .Select(x => x.ItemToAdd)
-            .ToList();
-        
-        _dbContext.AddRange(itemsToAdd);
-        _dbContext.RemoveRange(itemsToDelete);
-        await _dbContext.SaveChangesAsync();
-
-        return Ok(_mapper.Map<IEnumerable<ApiMealHistoryItem>>(itemsToAdd));
+        return Ok(_mapper.Map<IEnumerable<ApiMealHistoryItem>>(addedItems));
     }
 }
