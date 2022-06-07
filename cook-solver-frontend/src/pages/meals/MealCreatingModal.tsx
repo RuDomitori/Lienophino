@@ -1,102 +1,115 @@
-import ApiMeal from "../../backendApi/models/ApiMeal";
-import {FC, useCallback, useState} from "react";
+import React from "react";
 import {Formik} from "formik";
 import {object, string} from "yup";
-import MealApiService from "../../backendApi/services/MealApiService";
-import {ProblemDetails} from "../../backendApi/models/ProblemDetails";
 import {Modal} from "react-bootstrap";
 import classNames from "classnames";
 
-interface NewMealCreatingModalProps {
-    show: boolean,
-    onHide: () => void,
-    onSave: (meal: ApiMeal) => void
+
+interface MealCreatingModalProps {
+    onHide?: () => void,
+    onSave: (meal: MealCreatingFormValues) => void | Promise<void>
 }
 
-const MealCreatingModal: FC<NewMealCreatingModalProps> = function ({show, onHide, onSave}) {
-    return (
-        <Formik initialValues={{name:"", description:""}}
-                validationSchema={object({
-                    name: string().required("Name is required"),
-                    description: string().required("Description is required")
-                })}
-                onSubmit={(values, formikHelpers) => {
-                    MealApiService.create(values)
-                        .then(response => {
-                            if(response instanceof ProblemDetails)
-                                console.error(response);
-                            else {
-                                onSave(response);
-                            }
-
-                            formikHelpers.setSubmitting(false);
-                        });
-                }}>
-            {({
-                  values,
-                  errors, submitForm,
-                  handleChange, handleSubmit,
-                  handleBlur
-              }) => (
-                <Modal show={show}
-                       onHide={onHide}
-                       backdrop="static"
-                       centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title>New meal</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <form onSubmit={handleSubmit}>
-                            <div className="col-12 mb-3">
-                                <label className="form-label">Name</label>
-                                <input className={classNames("form-control", {"is-invalid": errors?.name})}
-                                       autoFocus type="text"
-                                       value={values.name} name="name"
-                                       onBlur={handleBlur} onChange={handleChange}/>
-                                <div className="invalid-feedback">
-                                    {errors?.name}
-                                </div>
-                            </div>
-
-                            <div className="col-12 mb-3">
-                                <label className="form-label">Description</label>
-                                <input className={classNames("form-control", {"is-invalid": errors?.description})}
-                                       type="text" autoFocus
-                                       value={values.description} name="description"
-                                       onBlur={handleBlur} onChange={handleChange}/>
-                                <div className="invalid-feedback">
-                                    {errors?.description}
-                                </div>
-                            </div>
-                        </form>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button className="btn btn-outline-danger" onClick={onHide}>
-                            Cancel
-                        </button>
-                        <button className="btn btn-primary" onClick={submitForm}>
-                            Save
-                        </button>
-                    </Modal.Footer>
-                </Modal>
-            )}
-        </Formik>
-    );
-};
-
-export function useMealCreatingModal(onSave?: (meal: ApiMeal) => void) {
-    const [showModal, setShowModal] = useState(false);
-    const handleHiding = useCallback(() => setShowModal(false),[]);
-    const handleSaving = useCallback((meal: ApiMeal) => {
-        setShowModal(false);
-        onSave?.(meal);
-    }, [onSave]);
-
-    return {
-        element: <MealCreatingModal show={showModal} onHide={handleHiding} onSave={handleSaving} />,
-        show() {setShowModal(true);},
-        hide() {setShowModal(false);}
-    };
+interface MealCreatingModalState {
+    show: boolean
 }
 
-export default MealCreatingModal;
+export interface MealCreatingFormValues {
+    name: string,
+    description: string
+}
+
+export default class MealCreatingModal extends React.Component<MealCreatingModalProps, MealCreatingModalState> {
+    constructor(props: MealCreatingModalProps) {
+        super(props);
+        this.state = {
+            show: false
+        };
+
+        this.hide = this.hide.bind(this);
+        this.show = this.show.bind(this);
+    }
+
+    show() {
+        this.setState({show: true});
+    }
+
+    hide() {
+        this.setState({show: false});
+        this.props.onHide?.();
+    }
+
+    private async save(values: MealCreatingFormValues): Promise<void> {
+        const promise = this.props.onSave(values);
+        if(promise) {
+            await promise;
+        }
+        this.hide();
+    }
+
+    private static getFormInitValues() {
+        return {name:"", description:""};
+    }
+
+    render() {
+        return (
+            <Formik initialValues={MealCreatingModal.getFormInitValues()}
+                    validationSchema={object({
+                        name: string().required("Name is required"),
+                        description: string()
+                    })}
+                    onSubmit={(values, formikHelpers) => {
+                        this.save(values).finally(() => formikHelpers.setSubmitting(false));
+                    }}>
+                {({
+                      values,
+                      errors, submitForm,
+                      handleChange, handleSubmit,
+                      handleBlur
+                  }) => (
+                    <Modal show={this.state.show}
+                           onHide={this.hide}
+                           backdrop="static"
+                           centered>
+                        <Modal.Header closeButton>
+                            <Modal.Title>New meal</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <form onSubmit={handleSubmit}>
+                                <div className="col-12 mb-3">
+                                    <label className="form-label">Name</label>
+                                    <input className={classNames("form-control", {"is-invalid": errors?.name})}
+                                           autoFocus type="text"
+                                           value={values.name} name="name"
+                                           onBlur={handleBlur} onChange={handleChange}/>
+                                    <div className="invalid-feedback">
+                                        {errors?.name}
+                                    </div>
+                                </div>
+
+                                <div className="col-12 mb-3">
+                                    <label className="form-label">Description</label>
+                                    <input className={classNames("form-control", {"is-invalid": errors?.description})}
+                                           type="text" autoFocus
+                                           value={values.description} name="description"
+                                           onBlur={handleBlur} onChange={handleChange}/>
+                                    <div className="invalid-feedback">
+                                        {errors?.description}
+                                    </div>
+                                </div>
+                            </form>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <button className="btn btn-outline-danger" onClick={this.hide}>
+                                Cancel
+                            </button>
+                            <button className="btn btn-primary" onClick={submitForm}>
+                                Save
+                            </button>
+                        </Modal.Footer>
+                    </Modal>
+                )}
+            </Formik>
+        );
+    }
+}

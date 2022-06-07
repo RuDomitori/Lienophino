@@ -1,6 +1,6 @@
-import {FC, useCallback} from "react";
+import {FC, useCallback, useRef} from "react";
 import useMeals from "../../hooks/useMeals";
-import {useMealCreatingModal} from "./MealCreatingModal";
+import MealCreatingModal, {MealCreatingFormValues} from "./MealCreatingModal";
 import MealCard from "./MealCard";
 import ApiMeal from "../../backendApi/models/ApiMeal";
 import MealApiService from "../../backendApi/services/MealApiService";
@@ -20,14 +20,24 @@ const MealsPage: FC = function () {
             });
     }, [meals]);
 
-    const modal = useMealCreatingModal(() => meals.reload());
+    const handleMealSave = useCallback((formValues: MealCreatingFormValues) => {
+        MealApiService.create(formValues)
+            .then(response => {
+                if(response instanceof ProblemDetails)
+                    console.error(response);
+                else {
+                    meals.reload();
+                }
+            });
+    }, [meals]);
+    const mealCreatingModalRef = useRef<MealCreatingModal>(null);
 
     return (
         <div className="container my-3">
             <div className="row my-3">
                 <div className="col-auto p-0">
                     <button className="btn btn-primary"
-                            onClick={() => modal.show()}
+                            onClick={() => mealCreatingModalRef.current?.show()}
                             type="button">
                         <i className="fa fa-plus" aria-hidden="true"></i> New
                     </button>
@@ -40,7 +50,7 @@ const MealsPage: FC = function () {
                               onDelete={handleMealDeleting} />
                 )}
             </div>
-            {modal.element}
+            <MealCreatingModal ref={mealCreatingModalRef} onSave={handleMealSave} />
         </div>
     );
 };
