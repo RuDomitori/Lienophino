@@ -37,6 +37,8 @@ public class MealsController : ControllerBase
     {
         [BindRequired] public string Name { get; set; }
         public string Description { get; set; }
+
+        public List<Guid> MealTagIds { get; set; } = new();
     }
     
     [HttpPost]
@@ -45,20 +47,29 @@ public class MealsController : ControllerBase
         var meal = await _mediator.Send(new CreateMeal
         {
             Name = dto.Name,
-            Description = dto.Description
+            Description = dto.Description,
+            MealTagIds = dto.MealTagIds
         });
         
         return Ok(_mapper.Map<ApiMeal>(meal));
     }
+
+    public class PutDto
+    {
+        [BindRequired] public string Name { get; set; }
+        public string Description { get; set; }
+        public List<Guid> MealTagIds { get; set; } = new();
+    }
     
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<ApiMeal>> Put(ApiMeal dto)
+    public async Task<ActionResult<ApiMeal>> Put(Guid id, PutDto dto)
     {
         var meal = await _mediator.Send(new ChangeMeal
         {
-            Id = dto.Id,
+            Id = id,
             Name = dto.Name,
-            Description = dto.Description
+            Description = dto.Description,
+            MealTagIds = dto.MealTagIds
         });
 
         return Ok(_mapper.Map<ApiMeal>(meal));

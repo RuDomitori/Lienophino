@@ -6,11 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CookSolver.Commands;
 
-public class DeleteMeal: IRequest<Meal>
+public class ChangeMealTag: IRequest<MealTag>
 {
-    [Required] public Guid Id { get; set; }
-
-    public class Handler : IRequestHandler<DeleteMeal, Meal>
+    public Guid Id { get; set; }
+    [Required]
+    public string Name { get; set; }
+    
+    public class Handler: IRequestHandler<ChangeMealTag, MealTag>
     {
         #region Constructor and dependencies
         
@@ -20,22 +22,23 @@ public class DeleteMeal: IRequest<Meal>
         {
             _dbContext = dbContext;
         }
-        
+
         #endregion
         
-        public async Task<Meal> Handle(DeleteMeal request, CancellationToken cancellationToken)
+        public async Task<MealTag> Handle(ChangeMealTag request, CancellationToken cancellationToken)
         {
-            var meal = await _dbContext.Set<Meal>()
-                .Include(x => x.Meal2MealTags)
+            var mealTag = await _dbContext.Set<MealTag>()
                 .FirstOrDefaultAsync(x => x.Id == request.Id);
 
-            if (meal is null)
-                throw new Exception("Meal not found");
+            if (mealTag is null)
+                throw new Exception("Meal tag not found");
 
-            _dbContext.Remove(meal);
+            mealTag.Name = request.Name;
+
+            _dbContext.Update(mealTag);
             await _dbContext.SaveChangesAsync();
 
-            return meal;
+            return mealTag;
         }
     }
 }

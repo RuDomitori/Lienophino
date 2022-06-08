@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CookSolver.Queries;
 
-public class GetMeals: IRequest<List<Meal>>
+public class GetMealTags: IRequest<List<MealTag>>
 {
-    public class Handler : IRequestHandler<GetMeals, List<Meal>>
+    public class Handler: IRequestHandler<GetMealTags, List<MealTag>>
     {
         #region Constructor and dependencies
         
@@ -20,11 +20,9 @@ public class GetMeals: IRequest<List<Meal>>
 
         #endregion
         
-        public async Task<List<Meal>> Handle(GetMeals request, CancellationToken cancellationToken)
+        public async Task<List<MealTag>> Handle(GetMealTags request, CancellationToken cancellationToken)
         {
-            return await _dbContext.Set<Meal>()
-                .Include(x => x.Meal2MealTags)
-                .ToListAsync();
+            return await _dbContext.Set<MealTag>().ToListAsync();
         }
     }
 }

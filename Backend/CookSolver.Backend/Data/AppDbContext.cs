@@ -16,6 +16,10 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<MealHistoryItem>()
             .HasKey(x => new {x.MealId, x.Date});
 
+        modelBuilder.Entity<MealTag>();
+        modelBuilder.Entity<Meal2MealTag>()
+            .HasKey(x => new {x.MealId, x.MealTagId});
+
         base.OnModelCreating(modelBuilder);
     }
 }
