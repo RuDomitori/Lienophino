@@ -10,7 +10,14 @@ public class AutoMapperProfile: Profile
         CreateMap<Meal, ApiMeal>()
             .ForMember(dst => dst.MealTagIds, opt => opt.MapFrom(src => src.Meal2MealTags.Select(x => x.MealTagId)));
         CreateMap<Meal, ApiMeal.WithNavProps>()
-            .ForMember(dst => dst.MealTags, opt => opt.MapFrom(src => src.Meal2MealTags.Select(x => x.MealTag)));
+            .ForMember(dst => dst.MealTagIds, opt => opt.MapFrom(src => src.Meal2MealTags.Select(x => x.MealTagId)))
+            .ForMember(
+                dst => dst.MealTags,
+                opt =>
+                {
+                    opt.Condition(src => src.Meal2MealTags.Any(x => x.MealTag != null));
+                    opt.MapFrom(src => src.Meal2MealTags.Select(x => x.MealTag));
+                });
         
         CreateMap<MealHistoryItem, ApiMealHistoryItem>()
             .ForMember(dst => dst.Date, opt => opt.MapFrom(x => x.Date.ToDateTime(TimeOnly.MinValue)));

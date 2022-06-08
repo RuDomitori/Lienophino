@@ -7,7 +7,7 @@ import MealApiService from "../../backendApi/services/MealApiService";
 import {ProblemDetails} from "../../backendApi/models/ProblemDetails";
 
 const MealsPage: FC = function () {
-    const meals = useMeals();
+    const meals = useMeals({includeMealTags: true});
     const handleMealEditing = useCallback((meal:ApiMeal) => console.log("Edit.", meal), []);
     const handleMealDeleting = useCallback((meal:ApiMeal) => {
         MealApiService.delete({id: meal.id})

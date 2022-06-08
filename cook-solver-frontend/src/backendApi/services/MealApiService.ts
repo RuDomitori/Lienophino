@@ -3,7 +3,7 @@ import {extractProblemDetails} from "../../utils";
 import ApiMeal from "../models/ApiMeal";
 
 interface GetArgs {
-
+    includeMealTags?: boolean;
 }
 
 interface CreateArgs {
@@ -18,6 +18,10 @@ interface DeleteArgs {
 export default abstract class MealApiService {
     public static async get(args?: GetArgs) {
         const url = new URL(`${configuration.hostApiUrl}/Meals`);
+        const searchParams = new URLSearchParams();
+        if(args?.includeMealTags)
+            searchParams.append("includeMealTags", "true");
+        url.search = searchParams.toString();
 
         const responsePromise = fetch(url.toString(), {
             method: "GET",

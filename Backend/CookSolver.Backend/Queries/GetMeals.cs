@@ -7,6 +7,8 @@ namespace CookSolver.Queries;
 
 public class GetMeals: IRequest<List<Meal>>
 {
+    public bool IncludeMealTags { get; set; }
+    
     public class Handler : IRequestHandler<GetMeals, List<Meal>>
     {
         #region Constructor and dependencies
@@ -22,9 +24,13 @@ public class GetMeals: IRequest<List<Meal>>
         
         public async Task<List<Meal>> Handle(GetMeals request, CancellationToken cancellationToken)
         {
-            return await _dbContext.Set<Meal>()
-                .Include(x => x.Meal2MealTags)
-                .ToListAsync();
+            var queryable = _dbContext.Set<Meal>().AsQueryable();
+
+            queryable = request.IncludeMealTags
+                ? queryable.Include(x => x.Meal2MealTags).ThenInclude(x => x.MealTag)
+                : queryable.Include(x => x.Meal2MealTags);
+
+            return await queryable.ToListAsync();
         }
     }
 }

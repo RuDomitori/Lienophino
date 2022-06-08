@@ -26,11 +26,11 @@ public class MealsController : ControllerBase
     #endregion
     
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ApiMeal>>> Get()
+    public async Task<ActionResult<IEnumerable<ApiMeal.WithNavProps>>> Get(bool includeMealTags)
     {
-        var meals = await _mediator.Send(new GetMeals());
+        var meals = await _mediator.Send(new GetMeals{IncludeMealTags = includeMealTags});
 
-        return Ok(_mapper.Map<IEnumerable<ApiMeal>>(meals));
+        return Ok(_mapper.Map<IEnumerable<ApiMeal.WithNavProps>>(meals));
     }
 
     public class PostDto

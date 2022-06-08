@@ -3,7 +3,11 @@ import ApiMeal from "../backendApi/models/ApiMeal";
 import MealApiService from "../backendApi/services/MealApiService";
 import {ProblemDetails} from "../backendApi/models/ProblemDetails";
 
-export default function useMeals() {
+interface UseMealsArgs {
+    includeMealTags?: boolean
+}
+
+export default function useMeals(args?: UseMealsArgs) {
     const [state, setState] = useState({
         meals: [] as ApiMeal[],
         loading: false,
@@ -13,7 +17,7 @@ export default function useMeals() {
     function load() {
         if(state.loading) return;
 
-        MealApiService.get({})
+        MealApiService.get({includeMealTags: args?.includeMealTags})
             .then(response => {
                 if (response instanceof ProblemDetails) {
                     console.error(response);
