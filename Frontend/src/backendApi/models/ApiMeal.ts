@@ -1,23 +1,24 @@
 import {pickByKeys} from "../../utils";
 import _ from "lodash";
 import ApiMealTag, {IApiMealTag} from "./ApiMealTag";
+import ApiIngredient, {IApiIngredient} from "./ApiIngredient";
 
 export interface IApiMeal {
     id: string;
     name: string;
     description: string | null;
-    mealTagIds: string[];
 
-    mealTags: IApiMealTag[] | null
+    mealTags: IApiMealTag[] | null;
+    ingredients: IApiIngredient[] | null;
 }
 
 export default class ApiMeal implements IApiMeal {
     id!: string;
     name!: string;
     description!: string | null;
-    mealTagIds!: string[];
 
     mealTags!: ApiMealTag[] | null;
+    ingredients!: ApiIngredient[] | null;
 
     constructor(iMeal: IApiMeal) {
         this.with(iMeal);
@@ -28,8 +29,8 @@ export default class ApiMeal implements IApiMeal {
             "id",
             "name",
             "description",
-            "mealTagIds",
-            "mealTags"
+            "mealTags",
+            "ingredients"
         ]);
 
         return _.assign(this, item);
@@ -42,6 +43,10 @@ export default class ApiMeal implements IApiMeal {
 
         item.mealTags = item.mealTags instanceof Array
             ? item.mealTags.map((x:any) => ApiMealTag.fromJson(x))
+            : null;
+
+        item.ingredients = item.ingredients instanceof Array
+            ? item.ingredients.map((x:any) => ApiIngredient.fromJson(x))
             : null;
 
         return new ApiMeal(item as IApiMeal);

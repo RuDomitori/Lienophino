@@ -11,6 +11,7 @@ public class CreateMeal: IRequest<Meal>
     [Required] public string Name { get; set; }
     public string Description { get; set; }
     public List<Guid> MealTagIds { get; set; }
+    public List<Guid> IngredientIds { get; set; }
     
     public class Handler: IRequestHandler<CreateMeal, Meal>
     {
@@ -37,10 +38,26 @@ public class CreateMeal: IRequest<Meal>
                     r => r.Id,
                     (l, r) => (MealTagId: l, Exist: r.Any()))
                 .Count(x => !x.Exist);
-
+            
             if (notExistedTagCount > 0)
                 throw new Exception($"{notExistedTagCount} meal tags not found");
+            
+            
+            var ingredientsFromDb = await _dbContext.Set<Ingredient>()
+                .Where(x => request.IngredientIds.Contains(x.Id))
+                .ToListAsync();
 
+            var notExistedIngredientCount = request.IngredientIds
+                .GroupJoin(ingredientsFromDb,
+                    l => l,
+                    r => r.Id,
+                    (_, r) => r.Any())
+                .Count(x => !x);
+
+            if (notExistedIngredientCount > 0)
+                throw new Exception($"{notExistedIngredientCount} ingredients not found");
+
+            
             var meal = new Meal
             {
                 Name = request.Name,
@@ -53,6 +70,11 @@ public class CreateMeal: IRequest<Meal>
                 MealTagId = x,
                 MealId = meal.Id
             }));
+            meal.Meal2Ingredients = request.IngredientIds.Select(x => new Meal2Ingredient
+            {
+                MealId = meal.Id,
+                IngredientId = x
+            }).ToList();
             await _dbContext.SaveChangesAsync();
 
             return meal;

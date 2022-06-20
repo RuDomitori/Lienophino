@@ -7,16 +7,21 @@ public class AutoMapperProfile: Profile
 {
     public AutoMapperProfile()
     {
-        CreateMap<Meal, ApiMeal>()
-            .ForMember(dst => dst.MealTagIds, opt => opt.MapFrom(src => src.Meal2MealTags.Select(x => x.MealTagId)));
+        CreateMap<Meal, ApiMeal>();
         CreateMap<Meal, ApiMeal.WithNavProps>()
-            .ForMember(dst => dst.MealTagIds, opt => opt.MapFrom(src => src.Meal2MealTags.Select(x => x.MealTagId)))
             .ForMember(
                 dst => dst.MealTags,
                 opt =>
                 {
-                    opt.Condition(src => src.Meal2MealTags.Any(x => x.MealTag != null));
+                    opt.Condition(src => src.Meal2MealTags != null);
                     opt.MapFrom(src => src.Meal2MealTags.Select(x => x.MealTag));
+                })
+            .ForMember(
+                dst => dst.Ingredients,
+                opt =>
+                {
+                    opt.Condition(src => src.Meal2Ingredients != null);
+                    opt.MapFrom(src => src.Meal2Ingredients.Select(x => x.Ingredient));
                 });
         
         CreateMap<MealHistoryItem, ApiMealHistoryItem>()
@@ -26,5 +31,6 @@ public class AutoMapperProfile: Profile
             .ForMember(dst => dst.Date, opt => opt.MapFrom(src => DateOnly.FromDateTime(src.Date)));
 
         CreateMap<MealTag, ApiMealTag>();
+        CreateMap<Ingredient, ApiIngredient>();
     }
 }

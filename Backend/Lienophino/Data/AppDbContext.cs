@@ -20,6 +20,10 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Meal2MealTag>()
             .HasKey(x => new {x.MealId, x.MealTagId});
 
+        modelBuilder.Entity<Ingredient>();
+        modelBuilder.Entity<Meal2Ingredient>()
+            .HasKey(x => new {x.MealId, x.IngredientId});
+
         base.OnModelCreating(modelBuilder);
     }
 }

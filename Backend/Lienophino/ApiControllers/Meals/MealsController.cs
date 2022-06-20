@@ -13,7 +13,7 @@ namespace Lienophino.ApiControllers.Meals;
 public class MealsController : ControllerBase
 {
     #region Constructor and dependensies
-    
+
     private readonly IMapper _mapper;
     private readonly IMediator _mediator;
 
@@ -24,11 +24,16 @@ public class MealsController : ControllerBase
     }
 
     #endregion
-    
+
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ApiMeal.WithNavProps>>> Get(bool includeMealTags)
+    public async Task<ActionResult<IEnumerable<ApiMeal.WithNavProps>>> Get(bool includeMealTags,
+        bool includeIngredients)
     {
-        var meals = await _mediator.Send(new GetMeals{IncludeMealTags = includeMealTags});
+        var meals = await _mediator.Send(new GetMeals
+        {
+            IncludeMealTags = includeMealTags,
+            IncludeIngredients = includeIngredients
+        });
 
         return Ok(_mapper.Map<IEnumerable<ApiMeal.WithNavProps>>(meals));
     }
@@ -39,8 +44,9 @@ public class MealsController : ControllerBase
         public string Description { get; set; }
 
         public List<Guid> MealTagIds { get; set; } = new();
+        public List<Guid> IngredientIds { get; set; } = new();
     }
-    
+
     [HttpPost]
     public async Task<ActionResult<ApiMeal>> Post(PostDto dto)
     {
@@ -48,9 +54,10 @@ public class MealsController : ControllerBase
         {
             Name = dto.Name,
             Description = dto.Description,
-            MealTagIds = dto.MealTagIds
+            MealTagIds = dto.MealTagIds,
+            IngredientIds = dto.IngredientIds
         });
-        
+
         return Ok(_mapper.Map<ApiMeal>(meal));
     }
 
@@ -59,8 +66,9 @@ public class MealsController : ControllerBase
         [BindRequired] public string Name { get; set; }
         public string Description { get; set; }
         public List<Guid> MealTagIds { get; set; } = new();
+        public List<Guid> IngredientIds { get; set; } = new();
     }
-    
+
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<ApiMeal>> Put(Guid id, PutDto dto)
     {
@@ -69,17 +77,18 @@ public class MealsController : ControllerBase
             Id = id,
             Name = dto.Name,
             Description = dto.Description,
-            MealTagIds = dto.MealTagIds
+            MealTagIds = dto.MealTagIds,
+            IngredientIds = dto.IngredientIds
         });
 
         return Ok(_mapper.Map<ApiMeal>(meal));
     }
-    
+
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<Guid>> Delete(Guid id)
     {
-        var meal = await _mediator.Send(new DeleteMeal{Id = id});
-        
+        var meal = await _mediator.Send(new DeleteMeal {Id = id});
+
         return Ok(_mapper.Map<ApiMeal>(meal));
     }
 }

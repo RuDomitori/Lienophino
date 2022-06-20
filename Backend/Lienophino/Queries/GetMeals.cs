@@ -8,7 +8,8 @@ namespace Lienophino.Queries;
 public class GetMeals: IRequest<List<Meal>>
 {
     public bool IncludeMealTags { get; set; }
-    
+    public bool IncludeIngredients { get; set; }
+
     public class Handler : IRequestHandler<GetMeals, List<Meal>>
     {
         #region Constructor and dependencies
@@ -28,7 +29,11 @@ public class GetMeals: IRequest<List<Meal>>
 
             queryable = request.IncludeMealTags
                 ? queryable.Include(x => x.Meal2MealTags).ThenInclude(x => x.MealTag)
-                : queryable.Include(x => x.Meal2MealTags);
+                : queryable;
+            
+            queryable = request.IncludeIngredients
+                ? queryable.Include(x => x.Meal2Ingredients).ThenInclude(x => x.Ingredient)
+                : queryable;
 
             return await queryable.ToListAsync();
         }
