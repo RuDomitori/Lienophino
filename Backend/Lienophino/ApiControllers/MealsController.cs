@@ -2,10 +2,13 @@ using AutoMapper;
 using Lienophino.ApiModel;
 using Lienophino.Commands;
 using Lienophino.Commands.Meals;
+using Lienophino.Data;
+using Lienophino.Data.Entities;
 using Lienophino.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lienophino.ApiControllers;
 
@@ -17,11 +20,13 @@ public class MealsController : ControllerBase
 
     private readonly IMapper _mapper;
     private readonly IMediator _mediator;
+    private readonly AppDbContext _dbContext;
 
-    public MealsController(IMapper mapper, IMediator mediator)
+    public MealsController(IMapper mapper, IMediator mediator, AppDbContext dbContext)
     {
         _mapper = mapper;
         _mediator = mediator;
+        _dbContext = dbContext;
     }
 
     #endregion
@@ -91,5 +96,23 @@ public class MealsController : ControllerBase
         var meal = await _mediator.Send(new DeleteMeal {Id = id});
 
         return Ok(_mapper.Map<ApiMeal>(meal));
+    }
+
+    [HttpGet("BestChoice")]
+    public async Task<ActionResult<IEnumerable<ApiMeal>>> BestChoice()
+    {
+        var mealHistoryItems = await _dbContext.Set<MealHistoryItem>()
+            .ToListAsync();
+
+        var meals = await _dbContext.Set<Meal>()
+            .Include(x => x.Meal2MealTags)
+            .ThenInclude(x => x.MealTag)
+            .Include(x => x.Meal2Ingredients)
+            .ThenInclude(x => x.Ingredient)
+            .ToListAsync();
+
+        // Писать туть
+
+        return Ok(_mapper.Map<IEnumerable<ApiMeal>>(meals));
     }
 }
