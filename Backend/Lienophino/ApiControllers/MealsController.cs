@@ -1,12 +1,13 @@
 using AutoMapper;
 using Lienophino.ApiModel;
 using Lienophino.Commands;
+using Lienophino.Commands.Meals;
 using Lienophino.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace Lienophino.ApiControllers.Meals;
+namespace Lienophino.ApiControllers;
 
 [ApiController]
 [Route("[controller]")]

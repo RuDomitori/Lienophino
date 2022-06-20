@@ -1,9 +1,8 @@
 ﻿using Lienophino.Data;
 using Lienophino.Data.Entities;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
-namespace Lienophino.Commands;
+namespace Lienophino.Commands.Ingredients;
 
 public class CreateIngredient: IRequest<Ingredient>
 {

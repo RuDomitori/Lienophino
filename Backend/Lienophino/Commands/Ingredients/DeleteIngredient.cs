@@ -3,13 +3,13 @@ using Lienophino.Data.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Lienophino.Commands;
+namespace Lienophino.Commands.Ingredients;
 
-public class DeleteMealTag: IRequest<MealTag>
+public class DeleteIngredient: IRequest<Ingredient>
 {
     public Guid Id { get; set; }
     
-    public class Handler: IRequestHandler<DeleteMealTag, MealTag>
+    public class Handler: IRequestHandler<DeleteIngredient, Ingredient>
     {
         #region Constructor and dependencies
         
@@ -22,19 +22,18 @@ public class DeleteMealTag: IRequest<MealTag>
 
         #endregion
         
-        public async Task<MealTag> Handle(DeleteMealTag request, CancellationToken cancellationToken)
+        public async Task<Ingredient> Handle(DeleteIngredient request, CancellationToken cancellationToken)
         {
-            
-            var mealTag = await _dbContext.Set<MealTag>()
+            var ingredient = await _dbContext.Set<Ingredient>()
                 .FirstOrDefaultAsync(x => x.Id == request.Id);
 
-            if (mealTag is null)
-                throw new Exception("Meal tag not found");
+            if (ingredient is null)
+                throw new Exception("Ingredient not found");
 
-            _dbContext.Remove(mealTag);
+            _dbContext.Remove(ingredient);
             await _dbContext.SaveChangesAsync();
 
-            return mealTag;
+            return ingredient;
         }
     }
 }

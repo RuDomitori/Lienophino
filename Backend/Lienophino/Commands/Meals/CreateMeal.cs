@@ -4,7 +4,7 @@ using Lienophino.Data.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Lienophino.Commands;
+namespace Lienophino.Commands.Meals;
 
 public class CreateMeal: IRequest<Meal>
 {

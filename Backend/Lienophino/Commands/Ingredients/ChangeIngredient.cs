@@ -3,7 +3,7 @@ using Lienophino.Data.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Lienophino.Commands;
+namespace Lienophino.Commands.Ingredients;
 
 public class ChangeIngredient: IRequest<Ingredient>
 {

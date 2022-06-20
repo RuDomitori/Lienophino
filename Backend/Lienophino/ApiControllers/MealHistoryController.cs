@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using Lienophino.ApiModel;
 using Lienophino.Commands;
+using Lienophino.Commands.Meals;
 using Lienophino.Data.Entities;
 using Lienophino.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Lienophino.ApiControllers.MealHistory;
+namespace Lienophino.ApiControllers;
 
 [ApiController]
 [Route("[Controller]")]
@@ -38,8 +39,14 @@ public class MealHistoryController : ControllerBase
         return Ok(_mapper.Map<List<ApiMealHistoryItem>>(items));
     }
 
+    public class PostDto
+    {
+        public List<ApiMealHistoryItem> ToAdd { get; set; } = new();
+        public List<ApiMealHistoryItem> ToDelete { get; set; } = new();
+    }
+    
     [HttpPost("Changes")]
-    public async Task<ActionResult<IEnumerable<ApiMealHistoryItem>>> Post(MealHistoryChangesDto changes)
+    public async Task<ActionResult<IEnumerable<ApiMealHistoryItem>>> Post(PostDto changes)
     {
         var addedItems = await _mediator.Send(new ChangeMealHistory
         {

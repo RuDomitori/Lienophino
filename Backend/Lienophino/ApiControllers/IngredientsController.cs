@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Lienophino.ApiModel;
 using Lienophino.Commands;
+using Lienophino.Commands.Ingredients;
 using Lienophino.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

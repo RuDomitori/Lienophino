@@ -3,7 +3,7 @@ using Lienophino.Data;
 using Lienophino.Data.Entities;
 using MediatR;
 
-namespace Lienophino.Commands;
+namespace Lienophino.Commands.MealTags;
 
 public class CreateMealTag: IRequest<MealTag>
 {

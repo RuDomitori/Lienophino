@@ -1,18 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Lienophino.Data;
+﻿using Lienophino.Data;
 using Lienophino.Data.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Lienophino.Commands;
+namespace Lienophino.Commands.MealTags;
 
-public class ChangeMealTag: IRequest<MealTag>
+public class DeleteMealTag: IRequest<MealTag>
 {
     public Guid Id { get; set; }
-    [Required]
-    public string Name { get; set; }
     
-    public class Handler: IRequestHandler<ChangeMealTag, MealTag>
+    public class Handler: IRequestHandler<DeleteMealTag, MealTag>
     {
         #region Constructor and dependencies
         
@@ -25,17 +22,16 @@ public class ChangeMealTag: IRequest<MealTag>
 
         #endregion
         
-        public async Task<MealTag> Handle(ChangeMealTag request, CancellationToken cancellationToken)
+        public async Task<MealTag> Handle(DeleteMealTag request, CancellationToken cancellationToken)
         {
+            
             var mealTag = await _dbContext.Set<MealTag>()
                 .FirstOrDefaultAsync(x => x.Id == request.Id);
 
             if (mealTag is null)
                 throw new Exception("Meal tag not found");
 
-            mealTag.Name = request.Name;
-
-            _dbContext.Update(mealTag);
+            _dbContext.Remove(mealTag);
             await _dbContext.SaveChangesAsync();
 
             return mealTag;
