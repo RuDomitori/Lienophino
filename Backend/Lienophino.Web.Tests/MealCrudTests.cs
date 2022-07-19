@@ -1,6 +1,6 @@
 using Lienophino.ApiModel;
-using Lienophino.Web.Tests.Ordering;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Utils.Testing.Ordering;
 using Xunit;
 
 namespace Lienophino.Web.Tests;
@@ -11,9 +11,10 @@ public sealed class IntegrationTestsFixture : IAsyncLifetime
     internal WebApplicationFactory<Program> WebAppFactory;
     internal Guid? CreatedMealId;
     
-    public async Task InitializeAsync()
+    public Task InitializeAsync()
     {
         WebAppFactory = new WebApplicationFactory<Program>();
+        return Task.CompletedTask;
     }
 
     async Task IAsyncLifetime.DisposeAsync()
@@ -23,7 +24,7 @@ public sealed class IntegrationTestsFixture : IAsyncLifetime
 }
 
 // Set the orderer
-[TestCaseOrderer("Lienophino.Web.Tests.Ordering.DependenceOrderer", "Lienophino.Web.Tests")]
+[TestCaseOrderer("Utils.Testing.Ordering.DependenceOrderer", "Utils.Testing")]
 // Need to turn off test parallelization so we can validate the run order
 [CollectionDefinition(nameof(MealCrudTests), DisableParallelization = true)]
 public sealed class MealCrudTests: IClassFixture<IntegrationTestsFixture>

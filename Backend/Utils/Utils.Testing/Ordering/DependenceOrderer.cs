@@ -1,7 +1,7 @@
 ﻿using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Lienophino.Web.Tests.Ordering;
+namespace Utils.Testing.Ordering;
 
 public sealed class DependenceOrderer: ITestCaseOrderer
 {

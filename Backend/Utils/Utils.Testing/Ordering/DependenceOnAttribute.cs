@@ -1,7 +1,7 @@
-﻿namespace Lienophino.Web.Tests.Ordering;
+﻿namespace Utils.Testing.Ordering;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)] 
-public class DependenceOnAttribute: Attribute
+public sealed class DependenceOnAttribute: Attribute
 {
     public string MethodName { get; }
 
