@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Utils;
 
 namespace Blobs.Fs;
@@ -9,20 +10,24 @@ namespace Blobs.Fs;
 /// <seealso cref="IBlobStorage"/>
 public sealed class FsBlobStorage : BaseBlobStorage
 {
-    // TODO: May be, have to add some logging here
+    // TODO: May be, have to add more logging here
     
     #region Constructor and dependencies
 
     private readonly string _rootPath;
+    private readonly ILogger<FsBlobStorage> _logger;
 
-    public FsBlobStorage(IOptions<Options> options)
+    public FsBlobStorage(IOptions<Options> options, ILogger<FsBlobStorage> logger)
     {
+        _logger = logger;
         _rootPath = options.Value.RootDirPath
                     ?? throw new ArgumentException("The root directory path is not specified", nameof(options));
 
         if (!Path.IsPathRooted(_rootPath))
             throw new ArgumentException("The root directory path must be not relative", nameof(options));
 
+        _logger.LogInformation("Blob storage's root dir path: {RootDirPath}", _rootPath);
+        
         EnsureDirExists(_rootPath);
     }
 

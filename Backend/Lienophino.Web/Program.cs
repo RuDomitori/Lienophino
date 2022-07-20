@@ -1,3 +1,5 @@
+using Blobs;
+using Blobs.Fs;
 using Lienophino.ApiModel;
 using Lienophino.Core.Queries;
 using Lienophino.Data;
@@ -12,10 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.CustomSchemaIds(type => type.ToString());
-});
+builder.Services.AddSwaggerGen(options => { options.CustomSchemaIds(type => type.ToString()); });
 builder.Host.UseSerilog((context, provider, configuration) =>
 {
     configuration
@@ -33,6 +32,10 @@ builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<Ap
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 builder.Services.AddMediatR(typeof(GetMeals));
 
+builder.Services.Configure<FsBlobStorage.Options>(
+    builder.Configuration.GetSection(nameof(FsBlobStorage))
+);
+builder.Services.AddSingleton<IBlobStorage, FsBlobStorage>();
 
 var app = builder.Build();
 

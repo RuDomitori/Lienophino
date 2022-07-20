@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 
 namespace Lienophino.ApiControllers;
 
@@ -95,6 +96,31 @@ public class MealsController : ControllerBase
         var meal = await _mediator.Send(new DeleteMeal {Id = id});
 
         return Ok(_mapper.Map<ApiMeal>(meal));
+    }
+
+    [HttpPatch("{mealId:guid}/Image")]
+    [Consumes("multipart/form-data", "application/json")]
+    public async Task UploadImage(Guid mealId, [FromForm, BindRequired] IFormFile formFile)
+    {
+        await _mediator.Send(new UploadMealImage
+        {
+            MealId = mealId,
+            Stream = formFile.OpenReadStream()
+        });
+    }
+
+    [HttpGet("{mealId:guid}/Image")]
+    public async Task<FileStreamResult> GetImage(Guid mealId)
+    {
+        var response = await _mediator.Send(new GetMealImage{MealId = mealId});
+
+        return File(response.Stream, "image/*", response.Meal.Name);
+    }
+
+    [HttpDelete("{mealId:guid}/Image")]
+    public async Task DeleteImage(Guid mealId)
+    {
+        await _mediator.Send(new DeleteMealImage {MealId = mealId});
     }
 
     [HttpGet("BestChoice")]

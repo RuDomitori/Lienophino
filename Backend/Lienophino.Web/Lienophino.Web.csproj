@@ -24,6 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Blobs\Blobs.Fs\Blobs.Fs.csproj" />
       <ProjectReference Include="..\Lienophino.Core\Lienophino.Core.csproj" />
       <ProjectReference Include="..\Lienophino.Data\Lienophino.Data.csproj" />
     </ItemGroup>

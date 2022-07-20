@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Utils;
 using Utils.Streams;
@@ -21,8 +22,10 @@ public sealed class TestsFixture : IDisposable
             {
                 RootDirPath = _rootDirPath
             });
-        
-        Storage = new FsBlobStorage(options.Object);
+
+        var logger = new Mock<ILogger<FsBlobStorage>>().Object;
+
+        Storage = new FsBlobStorage(options.Object, logger);
     }
 
     public void Dispose()
