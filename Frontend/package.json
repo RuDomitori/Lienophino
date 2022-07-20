@@ -16,20 +16,22 @@
     "react-bootstrap": "^2.4.0",
     "react-dom": "^18.1.0",
     "react-router-dom": "^6.3.0",
-    "react-scripts": "5.0.1",
     "typescript": "^4.7.2",
     "yup": "^0.32.11"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build"
+    "start": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview"
   },
   "eslintConfig": {
     "extends": [
       "react-app"
     ],
     "rules": {
-      "semi": [1]
+      "semi": [
+        1
+      ]
     }
   },
   "browserslist": {
@@ -48,6 +50,10 @@
     "@types/lodash": "^4.14.182",
     "@types/luxon": "^2.3.2",
     "@types/react-router-dom": "^5.3.3",
-    "sass": "^1.52.2"
+    "@vitejs/plugin-react": "^2.0.0",
+    "sass": "^1.52.2",
+    "vite": "^3.0.2",
+    "vite-plugin-svgr": "^2.2.0",
+    "vite-tsconfig-paths": "^3.5.0"
   }
 }

@@ -54,14 +54,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Configuring CORS to be able to run frontend by command "npm start"
+// Configuring CORS to be able to run frontend by command "yarn start"
 app.UseCors(corsPolicyBuilder =>
 {
     corsPolicyBuilder
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials()
-        .WithOrigins("http://localhost:3000");
+        .WithOrigins("http://127.0.0.1:5173");
 });
 
 app.UseAuthorization();
