@@ -1,8 +1,8 @@
 import React from "react";
 import {Formik} from "formik";
 import {object, string} from "yup";
-import {Modal} from "react-bootstrap";
-import classNames from "classnames";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@mui/material";
+import Box from "@mui/material/Box";
 
 
 interface MealCreatingModalProps {
@@ -18,6 +18,11 @@ export interface MealCreatingFormValues {
     name: string,
     description: string
 }
+
+const validationSchema = object({
+    name: string().required("Name is required"),
+    description: string()
+});
 
 export default class MealCreatingModal extends React.Component<MealCreatingModalProps, MealCreatingModalState> {
     constructor(props: MealCreatingModalProps) {
@@ -41,23 +46,20 @@ export default class MealCreatingModal extends React.Component<MealCreatingModal
 
     private async save(values: MealCreatingFormValues): Promise<void> {
         const promise = this.props.onSave(values);
-        if(promise) {
+        if (promise) {
             await promise;
         }
         this.hide();
     }
 
     private static getFormInitValues() {
-        return {name:"", description:""};
+        return {name: "", description: ""};
     }
 
     render() {
         return (
             <Formik initialValues={MealCreatingModal.getFormInitValues()}
-                    validationSchema={object({
-                        name: string().required("Name is required"),
-                        description: string()
-                    })}
+                    validationSchema={validationSchema}
                     onSubmit={(values, formikHelpers) => {
                         this.save(values).finally(() => formikHelpers.setSubmitting(false));
                     }}>
@@ -67,47 +69,43 @@ export default class MealCreatingModal extends React.Component<MealCreatingModal
                       handleChange, handleSubmit,
                       handleBlur
                   }) => (
-                    <Modal show={this.state.show}
-                           onHide={this.hide}
-                           backdrop="static"
-                           centered>
-                        <Modal.Header closeButton>
-                            <Modal.Title>New meal</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <form onSubmit={handleSubmit}>
-                                <div className="col-12 mb-3">
-                                    <label className="form-label">Name</label>
-                                    <input className={classNames("form-control", {"is-invalid": errors?.name})}
-                                           autoFocus type="text"
-                                           value={values.name} name="name"
-                                           onBlur={handleBlur} onChange={handleChange}/>
-                                    <div className="invalid-feedback">
-                                        {errors?.name}
-                                    </div>
+                    <Dialog open={this.state.show} onClose={this.hide}>
+                        <DialogTitle>New meal</DialogTitle>
+                        <DialogContent>
+                            <Box
+                                component="form"
+                                sx={{
+                                    '& .MuiTextField-root': { m: 1 },
+                                }}
+                                onSubmit={handleSubmit}
+                            >
+                                <div>
+                                    <TextField
+                                               label="Name"
+                                               autoFocus type="text"
+                                               error={errors?.name !== undefined}
+                                               helperText={errors?.name}
+                                               value={values.name} name="name"
+                                               onBlur={handleBlur} onChange={handleChange}
+                                    />
                                 </div>
-
-                                <div className="col-12 mb-3">
-                                    <label className="form-label">Description</label>
-                                    <input className={classNames("form-control", {"is-invalid": errors?.description})}
-                                           type="text" autoFocus
-                                           value={values.description} name="description"
-                                           onBlur={handleBlur} onChange={handleChange}/>
-                                    <div className="invalid-feedback">
-                                        {errors?.description}
-                                    </div>
+                                <div>
+                                    <TextField
+                                        label="Description"
+                                        autoFocus type="text"
+                                        error={errors?.description !== undefined}
+                                        helperText={errors?.description}
+                                        value={values.description} name="description"
+                                        onBlur={handleBlur} onChange={handleChange}
+                                    />
                                 </div>
-                            </form>
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <button className="btn btn-outline-danger" onClick={this.hide}>
-                                Cancel
-                            </button>
-                            <button className="btn btn-primary" onClick={submitForm}>
-                                Save
-                            </button>
-                        </Modal.Footer>
-                    </Modal>
+                            </Box>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button color="error" onClick={this.hide}>Cancel</Button>
+                            <Button color="primary" onClick={submitForm}>Save</Button>
+                        </DialogActions>
+                    </Dialog>
                 )}
             </Formik>
         );

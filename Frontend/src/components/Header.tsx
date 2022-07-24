@@ -1,33 +1,65 @@
-import React, {FC} from "react";
-import {NavLink} from "react-router-dom";
+import * as React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
 import configuration from "../configuration";
+import {Button} from "@mui/material";
+import {NavLink} from "react-router-dom";
 
-interface HeaderProps {
-    className: string
-}
+const pages = [
+    {
+        title: 'Meals',
+        path: "Meals"
+    },
+    {
+        title: 'Meal tags',
+        path: "MealTags"
+    },
+    {
+        title: 'Ingredients',
+        path: "Ingredients"
+    }
+];
 
-const Header: FC<HeaderProps> = function (props) {
-    const navLinkClassSelector = ({isActive}: { isActive: boolean }) => isActive
-        ? "nav-link px-2 text-warning"
-        : "nav-link px-2 text-white";
-
+const Header = () => {
     return (
-        <header className={"w-100 p-2 bg-dark text-white " + props.className}>
-            <nav className="container">
-                <div className="d-flex col-12 flex-wrap align-items-center justify-content-center">
-                    <span className="navbar-brand">{configuration.applicationTitle}</span>
-                    <ul className="nav me-auto mb-2 justify-content-center mb-md-0">
-                        <li key="/Meals">
-                            <NavLink to="/Meals" className={navLinkClassSelector}>Meals</NavLink>
-                        </li>
-                        {/*<li key="/MealHistory">*/}
-                        {/*    <NavLink to="/MealHistory" className={navLinkClassSelector}>History</NavLink>*/}
-                        {/*</li>*/}
-                    </ul>
-                </div>
-            </nav>
-        </header>
+        <AppBar position="static">
+            <Container maxWidth={false}>
+                <Toolbar disableGutters variant="dense">
+                    <Typography
+                        variant="h6"
+                        noWrap
+                        component="span"
+                        sx={{
+                            mr: 2,
+                            display: 'flex',
+                            fontFamily: 'monospace',
+                            fontWeight: 700,
+                            letterSpacing: '.3rem',
+                        }}
+                    >
+                        {configuration.applicationTitle}
+                    </Typography>
+
+                    <Box sx={{flexGrow: 1, display: 'flex'}}>
+                        {pages.map((page) => (
+                            <Button component={NavLink} to={page.path} key={page.path}
+                                    sx={{
+                                        color: 'white', display: 'block',
+                                        fontWeight: 600, fontFamily: 'monospace', textTransform: "none",
+                                        "&.active": {backgroundColor: "info.main"},
+                                        minWidth: 0
+                                    }}
+                            >
+                                {page.title}
+                            </Button>
+                        ))}
+                    </Box>
+                </Toolbar>
+            </Container>
+        </AppBar>
     );
 };
-
 export default Header;
