@@ -126,17 +126,7 @@ public class MealsController : ControllerBase
     [HttpGet("BestChoice")]
     public async Task<ActionResult<IEnumerable<ApiMeal>>> BestChoice()
     {
-        var mealHistoryItems = await _dbContext.Set<MealHistoryItem>()
-            .ToListAsync();
-
-        var meals = await _dbContext.Set<Meal>()
-            .Include(x => x.Meal2MealTags)
-            .ThenInclude(x => x.MealTag)
-            .Include(x => x.Meal2Ingredients)
-            .ThenInclude(x => x.Ingredient)
-            .ToListAsync();
-
-        // Писать туть
+        var meals = await _mediator.Send(new GetMealBestChoice());
 
         return Ok(_mapper.Map<IEnumerable<ApiMeal>>(meals));
     }
